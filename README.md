@@ -1,5 +1,7 @@
 Command-line tool to show posts from your favorite Reddit subreddits filtered by score.
 
+![console gif](https://raw.githubusercontent.com/FZambia/fire/master/console.gif)
+
 Default configuration file for `fire` located at `$HOME/.fire.json`
 
 Overview
