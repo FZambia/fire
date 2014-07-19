@@ -2,14 +2,15 @@ Command-line tool to show posts from your favorite Reddit subreddits filtered by
 
 Default configuration file for `fire` located at $HOME/.fire.json
 
-Installation:
--------------
+Installation
+------------
 
 ```bash
 go get github.com/FZambia/fire
 ```
 
-Usage:
+Usage
+-----
 
 Show help information:
 
@@ -54,7 +55,7 @@ Use custom configuration file
 fire -c custom_config.json
 ```
 
-LICENCE
+LICENSE
 -------
 
 MIT
