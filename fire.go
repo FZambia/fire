@@ -177,6 +177,7 @@ func prettyOutput(subreddits []*Subreddit) {
 	terminal.Stdout.Reset()
 }
 
+// print JSON output into stdout
 func jsonOutput(subreddits []*Subreddit) {
 	enc := json.NewEncoder(os.Stdout)
 	enc.Encode(subreddits)
