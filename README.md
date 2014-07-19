@@ -8,7 +8,7 @@ Overview
 --------
 
 Every day I wake up in the morning and check my favorite Reddit subreddits for a good new posts.
-Sometimes I have no enough time to do it browsing the web - so I've written `fire` - command-line
+Sometimes I have no enough time to browse the web - so I've written `fire` - command-line
 utility that keeps a list of my favorite subreddits and pretty prints current posts in console 
 based on minimal score for subreddit I previously set in configuration.
 
