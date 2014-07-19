@@ -1,6 +1,14 @@
-Command-line tool to show posts from your favorite Reddit subreddits filtered by score
+Command-line tool to show posts from your favorite Reddit subreddits filtered by score.
 
-Default configuration file for `fire` located at $HOME/.fire.json
+Default configuration file for `fire` located at `$HOME/.fire.json`
+
+Overview
+--------
+
+Every day I wake up in the morning and check my favorite Reddit subreddits for a good new posts.
+Sometimes I have no enough time to do it browsing the web - so I've written `fire` - command-line
+utility that keeps a list of my favorite subreddits and pretty prints current posts in console 
+based on minimal score for subreddit I previously set in configuration.
 
 Installation
 ------------
@@ -54,6 +62,13 @@ Use custom configuration file
 ```bash
 fire -c custom_config.json
 ```
+
+JSON output instead of pretty printing it:
+
+```bash
+fire --json
+```
+
 
 LICENSE
 -------
