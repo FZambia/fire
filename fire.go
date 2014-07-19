@@ -183,7 +183,7 @@ func jsonOutput(subreddits []*Subreddit) {
 	enc.Encode(subreddits)
 }
 
-// gather filled Subreddits from results channel, return slice with them
+// gather filled Subreddits from results channel
 func collect(results chan *Subreddit, configuration *Configuration, timeout time.Duration) {
 	entries := make([]*Subreddit, 0)
 	for {
