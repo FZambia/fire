@@ -1,4 +1,4 @@
-Command-line tool to show posts from your favorite Reddit subreddits filtered by score.
+Command-line tool to view posts from your favorite Reddit subreddits filtered by score.
 
 ![console gif](https://raw.githubusercontent.com/FZambia/fire/master/console.gif)
 
@@ -9,7 +9,7 @@ Overview
 
 Every day I wake up in the morning and check my favorite Reddit subreddits for a good new posts.
 Sometimes I have no enough time to browse the web - so I've written `fire` - command-line
-utility that keeps a list of my favorite subreddits and pretty prints current posts in console 
+utility that keeps a list of my favorite subreddits and pretty prints current hot posts in console 
 based on minimal score for subreddit I previously set in configuration.
 
 Installation

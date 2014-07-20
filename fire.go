@@ -237,7 +237,7 @@ func main() {
 	app := cli.NewApp()
 	app.Version = "0.1.0"
 	app.Name = "fire"
-	app.Usage = "show posts from your favorite Reddit subreddits filtered by score"
+	app.Usage = "view posts from your favorite Reddit subreddits filtered by score"
 
 	configFlag := cli.StringFlag{Name: "config, c", Value: path.Join(usr.HomeDir, ".fire.json"), Usage: "path to JSON configuration file"}
 	timeoutFlag := cli.IntFlag{Name: "timeout, t", Value: 3, Usage: "timeout"}
