@@ -10,6 +10,7 @@ import (
 	"os/user"
 	"path"
 	"strconv"
+	"text/template"
 	"time"
 
 	"github.com/codegangsta/cli"
@@ -183,6 +184,45 @@ func jsonOutput(subreddits []*Subreddit) {
 	enc.Encode(subreddits)
 }
 
+// opens browser with Subreddits representation
+func browserOutput(subreddits []*Subreddit) {
+
+	viewHandler := func(w http.ResponseWriter, r *http.Request) {
+		page := `<html>
+			<head>
+				<style type="text/css">
+					body {margin: 0 auto; max-width: 640px;}
+					.entry {margin-bottom: 15px;}
+				</style>
+			</head>
+		  	<body>
+		  		<div class="content">
+				    {{ range . }}
+						<h1>{{ .Name }}</h1>
+						<div class="subreddit">
+						{{ range .Entries }}
+							<div class="entry">
+								<a href="{{ .URL }}">{{ .Title }}</a><br />
+								<img src="{{ .URL }}" alt="" />
+							</div>
+						{{ end }}
+						</div>
+				    {{ end }}
+			    </div>
+		  	</body>
+		</html>`
+
+		t := template.New("browser")
+		t, _ = t.Parse(page)
+		t.Execute(w, subreddits)
+	}
+
+	http.HandleFunc("/", viewHandler)
+	if err := http.ListenAndServe(":8000", nil); err != nil {
+		log.Fatal("ListenAndServe: ", err)
+	}
+}
+
 // gather filled Subreddits from results channel
 func collect(results chan *Subreddit, configuration *Configuration, timeout time.Duration) {
 	entries := make([]*Subreddit, 0)
@@ -206,6 +246,7 @@ func load(configuration *Configuration, context *cli.Context) {
 
 	timeout := time.Duration(context.GlobalInt("timeout"))
 	jsonOut := context.GlobalBool("json")
+	browserOut := context.GlobalBool("browser")
 
 	if len(configuration.Subreddits) == 0 {
 		log.Fatalln("No subreddits found")
@@ -219,7 +260,9 @@ func load(configuration *Configuration, context *cli.Context) {
 
 	collect(results, configuration, timeout)
 
-	if jsonOut {
+	if browserOut {
+		browserOutput(configuration.Subreddits)
+	} else if jsonOut {
 		jsonOutput(configuration.Subreddits)
 	} else {
 		prettyOutput(configuration.Subreddits)
@@ -242,11 +285,13 @@ func main() {
 	configFlag := cli.StringFlag{Name: "config, c", Value: path.Join(usr.HomeDir, ".fire.json"), Usage: "path to JSON configuration file"}
 	timeoutFlag := cli.IntFlag{Name: "timeout, t", Value: 3, Usage: "timeout"}
 	jsonFlag := cli.BoolFlag{Name: "json, j", Usage: "JSON output"}
+	browserFlag := cli.BoolFlag{Name: "browser, b", Usage: "browser output"}
 
 	app.Flags = []cli.Flag{
 		configFlag,
 		timeoutFlag,
 		jsonFlag,
+		browserFlag,
 	}
 
 	app.Commands = []cli.Command{
