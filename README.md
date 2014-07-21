@@ -65,11 +65,21 @@ Use custom configuration file
 fire -c custom_config.json
 ```
 
-JSON output instead of pretty printing it:
+To get JSON output in console:
 
 ```bash
 fire --json
 ```
+
+And finally the sweetest thing - browser output!
+
+```
+fire --browser get gifs 3000
+```
+
+And your default browser will open a tab with something like this:
+
+![console gif](https://raw.githubusercontent.com/FZambia/fire/master/browser.png)
 
 
 LICENSE
