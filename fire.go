@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"html/template"
 	"io"
 	"io/ioutil"
 	"log"
@@ -11,9 +12,9 @@ import (
 	"path"
 	"strconv"
 	"strings"
-	"text/template"
 	"time"
 
+	"code.google.com/p/go.net/html"
 	"github.com/codegangsta/cli"
 	"github.com/toqueteos/webbrowser"
 	"github.com/wsxiaoys/terminal"
@@ -21,11 +22,14 @@ import (
 
 // individual entry from subreddit
 type Entry struct {
-	Title     string
-	Author    string
-	URL       string
-	Permalink string
-	Score     int
+	Title       string
+	Author      string
+	URL         string
+	Permalink   string
+	Score       int
+	Media_Embed struct {
+		Content string
+	}
 }
 
 // naive function to detect that entry is an image
@@ -38,6 +42,14 @@ func (entry *Entry) IsImage() bool {
 		}
 	}
 	return false
+}
+
+func (entry *Entry) HasEmbed() bool {
+	return entry.Media_Embed.Content != ""
+}
+
+func (entry *Entry) EmbedHtml() template.HTML {
+	return template.HTML(html.UnescapeString(entry.Media_Embed.Content))
 }
 
 // the feed is the full JSON data structure for subreddit
@@ -225,7 +237,10 @@ func browserOutput(subreddits []*Subreddit, port string) {
 								<span class="entry-title"><a target="_blank" href="{{ .URL }}">{{ .Title }}</a><span>
 								<span class="entry-permalink"><a target="_blank" href="http://www.reddit.com{{ .Permalink }}">comments</a><span>
 								{{ if .IsImage }}
-								    <img class="entry-image" src="{{ .URL }}" alt="" />
+								    <br /><img class="entry-image" src="{{ .URL }}" alt="" />
+								{{ end }}
+								{{ if .HasEmbed }}
+									<br />{{ .EmbedHtml }}
 								{{ end }}
 							</div>
 						{{ end }}
