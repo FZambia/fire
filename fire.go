@@ -205,7 +205,7 @@ func browserOutput(subreddits []*Subreddit, port string) {
 		page := `<html>
 			<head>
 				<style type="text/css">
-					body {margin: 0 auto; max-width: 640px; background: black; color: #CCC; font-family: Courier;}
+					body {margin: 0 auto; max-width: 640px; background: black; color: #CCC; font-family: Courier New, Courier; line-height: 1.4em;}
 					.content {padding: 10px;}
 					.entry {margin-bottom: 20px;}
 					.entry-title a:link, .entry-title a:visited {color: #9df; text-decoration: none;}
