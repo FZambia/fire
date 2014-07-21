@@ -10,9 +10,12 @@ import (
 	"os/user"
 	"path"
 	"strconv"
+	"strings"
+	"text/template"
 	"time"
 
 	"github.com/codegangsta/cli"
+	"github.com/toqueteos/webbrowser"
 	"github.com/wsxiaoys/terminal"
 )
 
@@ -23,6 +26,18 @@ type Entry struct {
 	URL       string
 	Permalink string
 	Score     int
+}
+
+// naive function to detect that entry is an image
+func (entry *Entry) IsImage() bool {
+	extensions := []string{"jpg", "jpeg", "png", "gif"}
+	lower_url := strings.ToLower(entry.URL)
+	for _, ext := range extensions {
+		if strings.HasSuffix(lower_url, ext) {
+			return true
+		}
+	}
+	return false
 }
 
 // the feed is the full JSON data structure for subreddit
@@ -183,6 +198,61 @@ func jsonOutput(subreddits []*Subreddit) {
 	enc.Encode(subreddits)
 }
 
+// opens browser with Subreddits representation
+func browserOutput(subreddits []*Subreddit, port string) {
+
+	viewHandler := func(w http.ResponseWriter, r *http.Request) {
+		page := `<html>
+			<head>
+				<style type="text/css">
+					body {margin: 0 auto; max-width: 640px; background: black; color: #CCC; font-family: Courier;}
+					.content {padding: 10px;}
+					.entry {margin-bottom: 20px;}
+					.entry-title a:link, .entry-title a:visited {color: #9df; text-decoration: none;}
+					.entry-permalink a:link, .entry-permalink a:visited {color: #CCC; text-decoration: none; font-size: 0.8em;}
+					.entry a:hover {color: #6cf;}
+					.entry-image {width: 100%; margin-top: 10px;}
+				</style>
+			</head>
+		  	<body>
+		  		<div class="content">
+				    {{ range . }}
+						<h1>{{ .Name }}</h1>
+						<div class="subreddit">
+						{{ range .Entries }}
+							<div class="entry">
+								<span class="entry-score">{{ .Score }}<span>
+								<span class="entry-title"><a target="_blank" href="{{ .URL }}">{{ .Title }}</a><span>
+								<span class="entry-permalink"><a target="_blank" href="http://www.reddit.com{{ .Permalink }}">comments</a><span>
+								{{ if .IsImage }}
+								    <img class="entry-image" src="{{ .URL }}" alt="" />
+								{{ end }}
+							</div>
+						{{ end }}
+						</div>
+				    {{ end }}
+			    </div>
+		  	</body>
+		</html>`
+
+		t := template.New("browser")
+		t, _ = t.Parse(page)
+		t.Execute(w, subreddits)
+	}
+
+	wait := make(chan bool)
+	http.HandleFunc("/", viewHandler)
+	log.Println("HTTP server starting, go to http://localhost:" + port)
+	go func() {
+		if err := http.ListenAndServe(":"+port, nil); err != nil {
+			log.Fatal("ListenAndServe: ", err)
+		}
+		wait <- true
+	}()
+	webbrowser.Open("http://localhost:" + port)
+	<-wait
+}
+
 // gather filled Subreddits from results channel
 func collect(results chan *Subreddit, configuration *Configuration, timeout time.Duration) {
 	entries := make([]*Subreddit, 0)
@@ -206,6 +276,8 @@ func load(configuration *Configuration, context *cli.Context) {
 
 	timeout := time.Duration(context.GlobalInt("timeout"))
 	jsonOut := context.GlobalBool("json")
+	browserOut := context.GlobalBool("browser")
+	port := context.GlobalString("port")
 
 	if len(configuration.Subreddits) == 0 {
 		log.Fatalln("No subreddits found")
@@ -219,7 +291,9 @@ func load(configuration *Configuration, context *cli.Context) {
 
 	collect(results, configuration, timeout)
 
-	if jsonOut {
+	if browserOut {
+		browserOutput(configuration.Subreddits, port)
+	} else if jsonOut {
 		jsonOutput(configuration.Subreddits)
 	} else {
 		prettyOutput(configuration.Subreddits)
@@ -242,11 +316,15 @@ func main() {
 	configFlag := cli.StringFlag{Name: "config, c", Value: path.Join(usr.HomeDir, ".fire.json"), Usage: "path to JSON configuration file"}
 	timeoutFlag := cli.IntFlag{Name: "timeout, t", Value: 3, Usage: "timeout"}
 	jsonFlag := cli.BoolFlag{Name: "json, j", Usage: "JSON output"}
+	browserFlag := cli.BoolFlag{Name: "browser, b", Usage: "browser output"}
+	portFlag := cli.StringFlag{Name: "port, p", Value: "17000", Usage: "HTTP server port for browser output"}
 
 	app.Flags = []cli.Flag{
 		configFlag,
 		timeoutFlag,
 		jsonFlag,
+		browserFlag,
+		portFlag,
 	}
 
 	app.Commands = []cli.Command{
