@@ -209,7 +209,7 @@ func prettyOutput(subreddits []*Subreddit) {
 			ct.ChangeColor(ct.Magenta, false, ct.None, false)
 			fmt.Print(entry.URL)
 		}
-		fmt.Print("\n")
+		fmt.Print("\n\n")
 	}
 	ct.ResetColor()
 }
