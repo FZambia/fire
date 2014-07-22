@@ -19,7 +19,7 @@ Installation
 go get github.com/FZambia/fire
 ```
 
-Binary releases will be added soon.
+Or just download binary release for your platform [here](https://github.com/FZambia/fire/releases).
 
 Usage
 -----
