@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"io"
 	"io/ioutil"
@@ -16,8 +17,8 @@ import (
 
 	"code.google.com/p/go.net/html"
 	"github.com/codegangsta/cli"
+	"github.com/daviddengcn/go-colortext"
 	"github.com/toqueteos/webbrowser"
-	"github.com/wsxiaoys/terminal"
 )
 
 // individual entry from subreddit
@@ -195,13 +196,22 @@ func fetch(subreddit *Subreddit, results chan *Subreddit) {
 // pretty print collected data into stdout
 func prettyOutput(subreddits []*Subreddit) {
 	for _, subreddit := range subreddits {
-		terminal.Stdout.Color("y").Print(subreddit.Name).Print(" ").Color("c").Print(subreddit.GetUrl())
+		ct.ChangeColor(ct.Yellow, false, ct.None, false)
+		fmt.Print(subreddit.Name + " ")
+		ct.ChangeColor(ct.Cyan, false, ct.None, false)
+		fmt.Print(subreddit.GetUrl())
 		for _, entry := range subreddit.Entries {
-			terminal.Stdout.Nl().Color("g").Print(entry.Score, " ").Reset().Print(entry.Title, " ").Color("m").Print(entry.URL)
+			fmt.Println()
+			ct.ChangeColor(ct.Green, false, ct.None, false)
+			fmt.Print(entry.Score, " ")
+			ct.ResetColor()
+			fmt.Print(entry.Title + " ")
+			ct.ChangeColor(ct.Magenta, false, ct.None, false)
+			fmt.Print(entry.URL)
 		}
-		terminal.Stdout.Nl().Nl()
+		fmt.Print("\n")
 	}
-	terminal.Stdout.Reset()
+	ct.ResetColor()
 }
 
 // print JSON output into stdout
@@ -393,7 +403,11 @@ func main() {
 					log.Fatalln("configuration file error:", err)
 				}
 				for _, subreddit := range configuration.Subreddits {
-					terminal.Stdout.Color("y").Print(subreddit.Name).Print(" ").Color("g").Print(subreddit.Score).Nl().Reset()
+					ct.ChangeColor(ct.Yellow, false, ct.None, false)
+					fmt.Print(subreddit.Name + " ")
+					ct.ChangeColor(ct.Green, false, ct.None, false)
+					fmt.Println(subreddit.Score)
+					ct.ResetColor()
 				}
 			},
 		},
