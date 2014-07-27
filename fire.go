@@ -21,7 +21,7 @@ import (
 	"github.com/toqueteos/webbrowser"
 )
 
-// individual entry from subreddit
+// Entry represents individual entry from subreddit
 type Entry struct {
 	Title       string
 	Author      string
@@ -33,7 +33,7 @@ type Entry struct {
 	}
 }
 
-// naive function to detect that entry is an image
+// IsImage is a naive function to detect that entry is an image
 func (entry *Entry) IsImage() bool {
 	extensions := []string{"jpg", "jpeg", "png", "gif"}
 	lower_url := strings.ToLower(entry.URL)
@@ -45,15 +45,17 @@ func (entry *Entry) IsImage() bool {
 	return false
 }
 
+// HasEmbed returns true or false depending on media content existence in entry
 func (entry *Entry) HasEmbed() bool {
 	return entry.Media_Embed.Content != ""
 }
 
+// EmbedHtml returns unescaped html of embed media
 func (entry *Entry) EmbedHtml() template.HTML {
 	return template.HTML(html.UnescapeString(entry.Media_Embed.Content))
 }
 
-// the feed is the full JSON data structure for subreddit
+// Feed is the full JSON data structure for subreddit
 // this sets up the array of Entry types (defined above)
 type Feed struct {
 	Data struct {
@@ -63,7 +65,7 @@ type Feed struct {
 	}
 }
 
-// subreddit representation
+// Subreddit representation
 type Subreddit struct {
 	Name         string
 	Score        int
@@ -72,7 +74,7 @@ type Subreddit struct {
 	ErrorMessage string  `json:",omitempty"`
 }
 
-// return new empty Subreddit instance
+// NewSubreddit returns new empty Subreddit instance
 func NewSubreddit(name string, score int) *Subreddit {
 	return &Subreddit{
 		Name:  name,
@@ -80,24 +82,24 @@ func NewSubreddit(name string, score int) *Subreddit {
 	}
 }
 
-// build JSON endpoint URL
+// GetJsonUrl builds JSON endpoint URL for subreddit
 func (subreddit *Subreddit) GetJsonUrl() string {
 	url := "http://www.reddit.com/r/" + subreddit.Name + "/hot.json"
 	return url
 }
 
-// build URL to browse
+// GetUrl builds URL to browse for subreddit
 func (subreddit *Subreddit) GetUrl() string {
 	url := "http://www.reddit.com/r/" + subreddit.Name + "/hot"
 	return url
 }
 
-// configuration struct
+// Configuration struct
 type Configuration struct {
 	Subreddits []*Subreddit
 }
 
-// fill Configuration based using JSON file
+// LoadFromFile fills Configuration based on JSON file
 func (c *Configuration) LoadFromFile(fileName string) error {
 
 	if _, err := os.Stat(fileName); os.IsNotExist(err) {
@@ -117,7 +119,7 @@ func (c *Configuration) LoadFromFile(fileName string) error {
 	return err
 }
 
-// dump configuration into JSON file
+// DumpIntoFile dumps configuration into JSON file
 func (c *Configuration) DumpIntoFile(fileName string) error {
 	b, err := json.MarshalIndent(c, "", "    ")
 	if err != nil {
